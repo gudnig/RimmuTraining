@@ -1,0 +1,46 @@
+﻿@inherits LayoutComponentBase
+    <header class="hero is-dark">
+        <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="http://rimmugygur.is">
+                    <img src="http://www.haukstaldir.de/wp-content/uploads/2014/05/Rimmugygur.png" >
+                </a>
+
+                <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+
+            <div class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="nav-item" href="members">Members</a>
+                </div>
+
+                <div class="navbar-end">
+                    <LoginDisplay></LoginDisplay>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="main-content columns is-fullheight">
+
+        <div class="section">
+            @Body
+        </div>
+                
+
+
+
+    </section>
+
+
+
+
+
+
+
+
+

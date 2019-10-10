@@ -1,0 +1,29 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <div class="navbar-item">
+            <div class="buttons">
+                <a href="Identity/Account/Manage">
+                    Hello, @context.User.Identity.Name! 
+                </a>
+
+                <form method="post" action="Identity/Account/LogOut">
+                    <button type="submit" class="button is-light">Log out</button>
+                </form>
+            </div>
+        </div>
+
+    </Authorized>
+    <NotAuthorized>
+        <div class="navbar-item">
+            <div class="buttons">
+                <a class="button is-primary" href="Identity/Account/Register">
+                    <strong>Register</strong>
+                </a>
+                <a class="button is-light" href="Identity/Account/Login">
+                    Log in
+                </a>
+            </div>
+        </div>
+        
+    </NotAuthorized>
+</AuthorizeView>

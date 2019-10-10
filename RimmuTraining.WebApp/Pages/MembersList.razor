@@ -1,0 +1,47 @@
+﻿@page "/members"
+@attribute [Authorize]
+@using RimmuTraining.WebApp.Domain.Members
+@inherits OwningComponentBase<MembersService>
+
+
+<div class="row text-center">
+    <div class="col-12">
+        <h3>Members</h3>
+        <AddMember OnAdd="@AddMember"/>
+        <div class="input-group">
+
+            
+        </div>
+        <ul class="list-group">
+            @if (members != null)
+            {
+                @foreach (var member in members)
+                {
+                    <li class="list-group-item">@member.Name</li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+<div class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <!-- Any other Bulma elements you want -->
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+@code {
+    private string newMemberName = "";
+    private List<Member> members;
+    protected override async Task OnInitializedAsync()
+    {
+
+        members = await Service.GetMembersAsync();
+    }
+    private void AddMember(Member member)
+    {
+        members.Add(member);
+        members = members.OrderBy(m => m.Name).ToList();
+    }
+
+}
