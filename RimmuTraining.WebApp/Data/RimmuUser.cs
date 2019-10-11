@@ -8,6 +8,6 @@ namespace RimmuTraining.WebApp.Data
 {
     public class RimmuUser : IdentityUser<Guid>
     {
-        public Member? Member { get; set; }
+        public Member Member { get; set; }
     }
 }

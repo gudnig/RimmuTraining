@@ -1,4 +1,6 @@
-﻿using RimmuTraining.WebApp.Infrastructure;
+﻿using Microsoft.AspNetCore.Identity;
+using RimmuTraining.WebApp.Data;
+using RimmuTraining.WebApp.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,23 +10,29 @@ namespace RimmuTraining.WebApp.Domain.Members
 {
     public class MembersService 
     {
-        private ICommandHandler<ConnectMemberToUser> connectMemberCommandHandler;
-        private ICommandHandler<CreateMember> createMemberCommandHandler;
-        private ICommandHandler<MakeTrainer> makeTrainerCommandHandler;
-        private IQueryHandler<GetUnconnectedUsers, List<User>> getUnconnectedUsersQueryHandler;
-        private IQueryHandler<GetMembers, List<Member>> getMembersQueryHandler;
+        private readonly ICommandHandler<ConnectMemberToUser> connectMemberCommandHandler;
+        private readonly ICommandHandler<CreateMember> createMemberCommandHandler;
+        private readonly ICommandHandler<MakeTrainer> makeTrainerCommandHandler;
+        private readonly IQueryHandler<GetUnconnectedUsers, List<User>> getUnconnectedUsersQueryHandler;
+        private readonly IQueryHandler<GetMembers, List<Member>> getMembersQueryHandler;
+        private readonly IQueryHandler<GetMemberById, Member> getMemberByIdQueryHandler;
+        private readonly ICommandHandler<AddToRole> addToRoleCommandHandler;
         public MembersService(
             ICommandHandler<ConnectMemberToUser> connectMemberCommandHandler, 
             ICommandHandler<CreateMember> createMemberCommandHandler, 
             ICommandHandler<MakeTrainer> makeTrainerCommandHandler,
             IQueryHandler<GetUnconnectedUsers, List<User>> getUnconnectedUsersQueryHandler,
-            IQueryHandler<GetMembers, List<Member>> getMembersQueryHandler)
+            IQueryHandler<GetMembers, List<Member>> getMembersQueryHandler, 
+            IQueryHandler<GetMemberById, Member> getMemberByIdQueryHandler,
+            ICommandHandler<AddToRole> addToRoleCommandHandler)
         {
             this.connectMemberCommandHandler = connectMemberCommandHandler;
             this.createMemberCommandHandler = createMemberCommandHandler;
             this.makeTrainerCommandHandler = makeTrainerCommandHandler;
             this.getUnconnectedUsersQueryHandler = getUnconnectedUsersQueryHandler;
             this.getMembersQueryHandler = getMembersQueryHandler;
+            this.getMemberByIdQueryHandler = getMemberByIdQueryHandler;
+            this.addToRoleCommandHandler = addToRoleCommandHandler;
         }
 
         public async Task<Result> ConnectMemberAndUserAsync(Guid memberId, Guid userId)
@@ -70,6 +78,24 @@ namespace RimmuTraining.WebApp.Domain.Members
 
             });
             return result;
+        }
+
+        public async Task<Member> GetMember(Guid id)
+        {
+            var result = await getMemberByIdQueryHandler.HandleAsync(new GetMemberById
+            {
+                MemberId = id
+            });
+            return result;
+        }
+
+        public async Task<Result> AddToRole(Guid memberId, string role)
+        {
+            return await addToRoleCommandHandler.HandleAsync(new AddToRole
+            {
+                MemberId = memberId,
+                Role = role
+            });
         }
     }
 }

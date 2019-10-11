@@ -12,6 +12,8 @@ namespace RimmuTraining.WebApp.Data
         public RimmuDbContext(DbContextOptions<RimmuDbContext> options)
             : base(options)
         { }
+
+       
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<Practice> Practices { get; set; }
         public DbSet<Member> Members { get; set; }

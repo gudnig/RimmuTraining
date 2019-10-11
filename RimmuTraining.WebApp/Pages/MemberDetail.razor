@@ -1,0 +1,139 @@
+﻿@page "/members/{id:guid}"
+@using RimmuTraining.WebApp.Domain.Members
+@inherits OwningComponentBase<MembersService>
+
+@if (member == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="hero">
+        <div class="hero-body is-primary">
+            <div class="container">
+                <h1 class="title">
+                    @member.Name
+                </h1>
+                <h2 class="subtitle">
+                    Manage member details
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="columns">
+        <div class="column">
+            @if (member.User == null)
+            {
+
+            }
+            else
+            {
+                @foreach (var role in member.User.Roles)
+                {
+                    <Badge Color="Color.Secondary">@role</Badge>
+                }
+            }
+        </div>
+        <div class="column">
+
+            @if (member.User == null)
+            {
+                <AuthorizeView Policy="IsAdmin">
+                    <Authorized>
+                        <Field>
+                            <FieldLabel>Select a user for this member</FieldLabel>
+                            <SelectEdit TValue="Guid" SelectedValue="@selectedUserId" SelectedValueChanged="@OnUserSelected">
+                                <!--This null user is an ugly solution would like to replace it-->
+                                <SelectItem Value="nullUser.Id">@nullUser.UserName</SelectItem>
+                                @foreach (var user in unconnectedUsers)
+                                {
+                                    <SelectItem Value="user.Id">@user.UserName</SelectItem>
+                                }
+                            </SelectEdit>
+                        </Field>
+                    </Authorized>
+                    <NotAuthorized>
+                        This member is not connected to a user. First have the user register. Then get an admin to change it.
+                    </NotAuthorized>
+                </AuthorizeView>
+            }
+            else
+            {
+                @member.User.UserName
+                <AuthorizeView>
+                    <Field>
+                        <Dropdown>
+                            <DropdownToggle Color="Color.Primary">
+                                Add To Role
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                <DropdownItem Clicked="@(() => AddToRole("Admin"))">Admin</DropdownItem>
+                                <DropdownDivider />
+                                <DropdownItem Clicked="@(() => AddToRole("Archery Trainer"))">Archery Trainer</DropdownItem>
+                                <DropdownDivider />
+                                <DropdownItem Clicked="@(() => AddToRole("Archer"))">Archer</DropdownItem>
+                                <DropdownDivider />
+                                <DropdownItem Clicked="@(() => AddToRole("Fighting Trainer"))">Fighting Trainer</DropdownItem>
+                                <DropdownDivider />
+                                <DropdownItem Clicked="@(() => AddToRole("Fighting"))">Fighter</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
+
+                    </Field>
+                </AuthorizeView>
+            }
+
+        </div>
+    </div>
+}
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+    private List<User> unconnectedUsers = new List<User>();
+    private Member member;
+    private User nullUser = new User
+    {
+        Id = Guid.Empty,
+        UserName = "Select a user"
+    };
+    private Guid selectedUserId;
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        member = await Service.GetMember(id);
+        unconnectedUsers = await Service.GetUsersAsync();
+        selectedUserId = Guid.Empty;
+    }
+
+    private async Task OnUserSelected(Guid userId)
+    {
+        var user = unconnectedUsers.FirstOrDefault(u => u.Id == userId);
+        if (userId == Guid.Empty)
+        {
+            // Show error
+
+        }
+        var result = await Service.ConnectMemberAndUserAsync(member.Id, userId);
+        if (result.Succeeded)
+        {
+
+            member.User = new User
+            {
+                Id = user.Id,
+                UserName = user.UserName
+            };
+        }
+    }
+
+    private async Task AddToRole(string role)
+    {
+        var result = await Service.AddToRole(member.Id, role);
+        if (result.Succeeded)
+        {
+            member.User.Roles.Add(role);
+        }
+    }
+
+}

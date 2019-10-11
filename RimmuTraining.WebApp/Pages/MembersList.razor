@@ -3,41 +3,51 @@
 @using RimmuTraining.WebApp.Domain.Members
 @inherits OwningComponentBase<MembersService>
 
-
-<div class="row text-center">
-    <div class="col-12">
-        <h3>Members</h3>
-        <AddMember OnAdd="@AddMember"/>
-        <div class="input-group">
-
-            
+<div class="hero">
+    <div class="hero-body is-primary">
+        <div class="container">
+            <h1 class="title">
+                Members
+            </h1>
+            <h2 class="subtitle">
+                Manage members and users
+            </h2>
         </div>
-        <ul class="list-group">
-            @if (members != null)
-            {
-                @foreach (var member in members)
-                {
-                    <li class="list-group-item">@member.Name</li>
-                }
-            }
-        </ul>
     </div>
 </div>
-<div class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content">
-        <!-- Any other Bulma elements you want -->
+
+
+<div class="level">
+    <div class="level-left"></div>
+    <div class="level-right">
+        <div class="level-item">
+            <AddMember OnAdd="@AddMember" />
+        </div>
     </div>
-    <button class="modal-close is-large" aria-label="close"></button>
+
+</div>
+<div class="list">
+    @if (members != null)
+    {
+        @foreach (var member in members)
+        {
+            <a href="members/@member.Id" class="list-item">
+                @member.Name
+
+            </a>
+        }
+    }
 </div>
 @code {
-    private string newMemberName = "";
     private List<Member> members;
+    private List<User> unconnectedUsers = new List<User>();
+
     protected override async Task OnInitializedAsync()
     {
-
         members = await Service.GetMembersAsync();
     }
+
+
     private void AddMember(Member member)
     {
         members.Add(member);

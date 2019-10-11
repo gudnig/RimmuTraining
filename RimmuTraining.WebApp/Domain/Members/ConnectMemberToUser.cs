@@ -1,4 +1,5 @@
-﻿using RimmuTraining.WebApp.Infrastructure;
+﻿using RimmuTraining.WebApp.Data;
+using RimmuTraining.WebApp.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,21 @@ namespace RimmuTraining.WebApp.Domain.Members
     }
     public class ConnectMemberToUserCommandHandler : ICommandHandler<ConnectMemberToUser>
     {
-        public Task<Result> HandleAsync(ConnectMemberToUser command)
+        private readonly RimmuDbContext dbContext;
+        public ConnectMemberToUserCommandHandler(RimmuDbContext dbContext)
         {
-            throw new NotImplementedException();
+            this.dbContext = dbContext;
+        }
+        public async Task<Result> HandleAsync(ConnectMemberToUser command)
+        {
+            var member = await dbContext.Members.FindAsync(command.MemberId);
+            if(member == null)
+            {
+                return new Result("Member not found.");
+            }
+            member.UserId = command.UserId;
+            dbContext.SaveChanges();
+            return new Result();
         }
     }
 }

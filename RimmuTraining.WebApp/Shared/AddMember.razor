@@ -1,63 +1,79 @@
 ﻿@using RimmuTraining.WebApp.Domain.Members
-@using RimmuTraining.WebApp.ViewModels
 
 @inherits OwningComponentBase<MembersService>
 
-<div class="@((isActive ? "modal is-active" : "modal"))">
-    <div class="modal-background" @onclick="Toggle"></div>
-    <div class="modal-content">
-        <div class="box">
-            <h3 class="title">New Member</h3>
-            <EditForm Model="@newMember" OnValidSubmit="@CreateMember">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="field">
-                    <label class="label">Name</label>
-                    <div class="control">
-                        <input class="input" type="text" @bind-value="@newMember.Name" placeholder="New Member Full Name" />
-                    </div>
-                    <p class="help">Please type in full name</p>
-                    <button class="button" type="submit">Add Member</button>
-                </div>
-            </EditForm>
+<Button Clicked="@ShowModal">Add New Member</Button>
 
-        </div>
+<Modal @ref="modalRef">
+    <ModalBackdrop />
+    <ModalContent IsCentered="true">
+        <ModalHeader>
+            <ModalTitle>Add Member</ModalTitle>
+            <CloseButton Clicked="@HideModal" />
+        </ModalHeader>
+        <Form>
+            <ModalBody>
+                <Field>
+                    <Validation Validator="@ValidationRule.IsNotEmpty">
+                        <FieldLabel>Name</FieldLabel>
+                        <TextEdit Placeholder="Enter full name...">
+                            <Feedback>
+                                <ValidationError>Please enter the full name.</ValidationError>
 
-    </div>
-    <button class="modal-close is-large" @onclick="@Toggle" aria-label="close"></button>
-</div>
+                            </Feedback>
+                        </TextEdit>
 
-<button class="button" @onclick="@Toggle">Add Member</button>
+                    </Validation>
+                </Field>
+
+
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Primary" Clicked="@CreateMember" Type="ButtonType.Submit" PreventDefaultOnSubmit="true" Class="is-right">Add</Button>
+            </ModalFooter>
+        </Form>
+    </ModalContent>
+</Modal>
+
+
 
 @code {
-
     [Parameter]
     public EventCallback<Member> OnAdd { get; set; }
 
-    private NewMember newMember = new NewMember();
-    bool isActive = false;
+    private Modal modalRef;
+    private string newMemberName = "";
+
+
+    private void ShowModal()
+    {
+        newMemberName = "";
+        modalRef.Show();
+    }
+
+    private void HideModal()
+    {
+        modalRef.Hide();
+    }
 
 
     private async Task CreateMember()
     {
-        Guid id = Guid.NewGuid();
-        var result = await Service.CreateMemberAsync(newMember.Name, id);
-        if (result.Succeeded)
+        if (!string.IsNullOrWhiteSpace(newMemberName))
         {
-            await OnAdd.InvokeAsync(new Member
+            Guid id = Guid.NewGuid();
+            var result = await Service.CreateMemberAsync(newMemberName, id);
+            if (result.Succeeded)
             {
-                Id = id,
-                Name = newMember.Name,
-                Activities = new List<string>()
-            });
-            Toggle();
+                await OnAdd.InvokeAsync(new Member
+                {
+                    Id = id,
+                    Name = newMemberName,
+                    
+                });
+                HideModal();
+            }
         }
-
-    }
-
-    void Toggle()
-    {
-        isActive = !isActive;
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RimmuTraining.WebApp.Data;
 using RimmuTraining.WebApp.Infrastructure;
 using System;
@@ -13,10 +14,12 @@ namespace RimmuTraining.WebApp.Domain.Members
     }
     public class GetMembersQueryHandler : IQueryHandler<GetMembers, List<Member>>
     {
-        private RimmuDbContext dbContext;
-        public GetMembersQueryHandler(RimmuDbContext dbContext)
+        private readonly RimmuDbContext dbContext;
+        private readonly UserManager<RimmuUser> userManager;
+        public GetMembersQueryHandler(RimmuDbContext dbContext, UserManager<RimmuUser> userManager)
         {
             this.dbContext = dbContext;
+            this.userManager = userManager;
         }
         public async Task<List<Member>> HandleAsync(GetMembers query)
         {
@@ -35,25 +38,11 @@ namespace RimmuTraining.WebApp.Domain.Members
                     memberItem.User = new User
                     {
                         Id = member.User.Id,
-                        UserName = member.User.UserName
+                        UserName = member.User.UserName,
+                        Roles = (await userManager.GetRolesAsync(member.User)).ToList()
                     };
                 }
-                if (member.Events.Any(e => e.Title == "Became Archery Trainer"))
-                {
-                    memberItem.Activities.Add("Archery Trainer");
-                }
-                if (member.Events.Any(e => e.Title == "Became Fighting Trainer"))
-                {
-                    memberItem.Activities.Add("Fighting Trainer");
-                }
-                if (member.Events.Any(e => e.Title == "Started Fighting"))
-                {
-                    memberItem.Activities.Add("Fighter");
-                }
-                if (member.Events.Any(e => e.Title == "Started Archery"))
-                {
-                    memberItem.Activities.Add("Archery");
-                }
+                
                 result.Add(memberItem);
             }
             return result;

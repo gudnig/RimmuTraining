@@ -15,7 +15,7 @@ namespace RimmuTraining.WebApp.Domain.Members
 
     public class CreateMemberCommandHandler : ICommandHandler<CreateMember>
     {
-        private RimmuDbContext dbContext;
+        private readonly RimmuDbContext dbContext;
         public CreateMemberCommandHandler(RimmuDbContext dbContext)
         {
             this.dbContext = dbContext;
@@ -34,7 +34,7 @@ namespace RimmuTraining.WebApp.Domain.Members
                 await dbContext.SaveChangesAsync();
                 return new Result();
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
                 throw;

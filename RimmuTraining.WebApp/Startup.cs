@@ -17,7 +17,9 @@ using RimmuTraining.WebApp.Areas.Identity;
 using RimmuTraining.WebApp.Data;
 using RimmuTraining.WebApp.Domain.Members;
 using RimmuTraining.WebApp.Infrastructure;
-
+using Blazorise;
+using Blazorise.Bulma;
+using Blazorise.Icons.FontAwesome;
 
 namespace RimmuTraining.WebApp
 {
@@ -44,20 +46,30 @@ namespace RimmuTraining.WebApp
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
-            })
+            }).AddRoles<RimmuRole>()
                 .AddEntityFrameworkStores<RimmuDbContext>();
             services.AddAuthorization(config =>
             {
-                config.AddPolicy("IsTrainer", policy => policy.RequireRole("Fighting Trainer", "Archery Trainer"));
+                config.AddPolicy("IsTrainer", policy => policy.RequireRole("Fighting Trainer", "Archery Trainer", "Admin"));
+                config.AddPolicy("IsAdmin", policy => policy.RequireRole("Admin"));
             });
             services.AddRazorPages();
             services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; }); ;
+            services.AddBlazorise(options =>
+                {
+                    options.ChangeTextOnKeyPress = true;
+                }) // from v0.6.0-preview4
+                .AddBulmaProviders()
+                .AddFontAwesomeIcons();
+
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<RimmuUser>>();
-            services.AddScoped<IQueryHandler<GetMembers, List<RimmuTraining.WebApp.Domain.Members.Member>>, GetMembersQueryHandler>();
+            services.AddScoped<IQueryHandler<GetMembers, List<Domain.Members.Member>>, GetMembersQueryHandler>();
             services.AddScoped<IQueryHandler<GetUnconnectedUsers, List<User>>, GetUnconnectedUsersQueryHandler>();
+            services.AddScoped<IQueryHandler<GetMemberById, Domain.Members.Member>, GetMemberByIdQueryHandler>();
             services.AddScoped<ICommandHandler<MakeTrainer>, MakeTrainerCommandHandler>();
             services.AddScoped<ICommandHandler<ConnectMemberToUser>, ConnectMemberToUserCommandHandler>();
             services.AddScoped<ICommandHandler<CreateMember>, CreateMemberCommandHandler>();
+            services.AddScoped<ICommandHandler<AddToRole>, AddToRoleCommandHandler>();
             services.AddScoped<MembersService>();
 
         }
@@ -87,6 +99,8 @@ namespace RimmuTraining.WebApp
 
             app.UseRouting();
 
+            app.ApplicationServices.UseBulmaProviders().UseFontAwesomeIcons();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -98,5 +112,56 @@ namespace RimmuTraining.WebApp
             });
             builder.Build();
         }
+        //private void AddRoles(IApplicationBuilder app)
+        //{
+        //    using (var scope = app.ApplicationServices.CreateScope())
+        //    {
+        //        var roleManager = scope.ServiceProvider.GetService<RoleManager<RimmuRole>>();
+        //        var result = roleManager.CreateAsync(new RimmuRole
+        //        {
+        //            ConcurrencyStamp = Guid.NewGuid().ToString(),
+        //            Id = Guid.NewGuid(),
+        //            Name = "Admin",
+        //            NormalizedName = "ADMIN"
+        //        }).Result;
+        //        result = roleManager.CreateAsync(new RimmuRole
+        //        {
+        //            ConcurrencyStamp = Guid.NewGuid().ToString(),
+        //            Id = Guid.NewGuid(),
+        //            Name = "Admin",
+        //            NormalizedName = "ADMIN"
+        //        }).Result;
+        //        result = roleManager.CreateAsync(new RimmuRole
+        //        {
+        //            ConcurrencyStamp = Guid.NewGuid().ToString(),
+        //            Id = Guid.NewGuid(),
+        //            Name = "Archer",
+        //            NormalizedName = "ARCHER"
+        //        }).Result;
+        //        result = roleManager.CreateAsync(new RimmuRole
+        //        {
+        //            ConcurrencyStamp = Guid.NewGuid().ToString(),
+        //            Id = Guid.NewGuid(),
+        //            Name = "Archery Trainer",
+        //            NormalizedName = "ARCHERY TRAINER"
+        //        }).Result;
+        //        result = roleManager.CreateAsync(new RimmuRole
+        //        {
+        //            ConcurrencyStamp = Guid.NewGuid().ToString(),
+        //            Id = Guid.NewGuid(),
+        //            Name = "Fighter",
+        //            NormalizedName = "Fighter"
+        //        }).Result;
+
+        //        result = roleManager.CreateAsync(new RimmuRole
+        //        {
+        //            ConcurrencyStamp = Guid.NewGuid().ToString(),
+        //            Id = Guid.NewGuid(),
+        //            Name = "Fighting",
+        //            NormalizedName = "Fighting Trainer"
+        //        }).Result;
+        //    }
+        //}
     }
+    
 }

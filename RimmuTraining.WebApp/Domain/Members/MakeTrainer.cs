@@ -16,8 +16,8 @@ namespace RimmuTraining.WebApp.Domain.Members
     }
     public class MakeTrainerCommandHandler : ICommandHandler<MakeTrainer>
     {
-        private RimmuDbContext dbContext;
-        private UserManager<RimmuUser> userManager;
+        private readonly RimmuDbContext dbContext;
+        private readonly UserManager<RimmuUser> userManager;
         public MakeTrainerCommandHandler(RimmuDbContext dbContext, UserManager<RimmuUser> userManager)
         {
             this.dbContext = dbContext;

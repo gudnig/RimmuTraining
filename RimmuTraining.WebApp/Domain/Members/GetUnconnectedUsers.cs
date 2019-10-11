@@ -14,7 +14,7 @@ namespace RimmuTraining.WebApp.Domain.Members
 
     public class GetUnconnectedUsersQueryHandler : IQueryHandler<GetUnconnectedUsers, List<User>>
     {
-        private RimmuDbContext dbContext;
+        private readonly RimmuDbContext dbContext;
         public GetUnconnectedUsersQueryHandler(RimmuDbContext dbContext)
         {
             this.dbContext = dbContext;
