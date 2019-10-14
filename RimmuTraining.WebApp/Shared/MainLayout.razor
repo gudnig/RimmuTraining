@@ -11,9 +11,16 @@
     
     <BarMenu>
         <BarStart>
-            <BarItem>
-                <BarLink To="members">Members</BarLink>
-            </BarItem>
+            <AuthorizeView Policy="IsTrainer">
+                <BarItem>
+                    <BarLink To="members">Members</BarLink>
+                </BarItem>
+            </AuthorizeView>
+            <AuthorizeView Policy="IsTrainer">
+                <BarItem>
+                    <BarLink To="practices">Practices</BarLink>
+                </BarItem>
+            </AuthorizeView>
         </BarStart>
         <BarEnd>
             <LoginDisplay></LoginDisplay>

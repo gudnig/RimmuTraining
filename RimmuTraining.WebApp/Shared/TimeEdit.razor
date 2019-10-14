@@ -1,0 +1,63 @@
+﻿@using Blazorise
+@inherits BaseInputComponent<TimeSpan?>
+@*Simple TimePicker component in the style of Blazorise*@
+
+@if (!HasCustomRegistration)
+{
+    <input @ref="@ElementRef" @bind="timeProxy" id="@ElementId" type="time" class="@ClassNames" style="@StyleNames" disabled="@IsDisabled" readonly="@IsReadonly" />
+    @ChildContent
+    @Feedback
+}
+else
+{
+    @RenderCustomComponent()
+}
+
+@code {
+    protected override void BuildClasses(ClassBuilder builder)
+    {
+        builder.Append(ClassProvider.DateEdit());
+        builder.Append(ClassProvider.DateEditSize(Size), Size != Size.None);
+        builder.Append(ClassProvider.DateEditValidation(ParentValidation?.Status ?? ValidationStatus.None), ParentValidation?.Status != ValidationStatus.None);
+
+        base.BuildClasses(builder);
+    }
+
+
+
+    [Parameter]
+    public TimeSpan? Time
+    {
+        get
+        {
+            TimeSpan result;
+            if (string.IsNullOrEmpty(timeProxy))
+                return null;
+            if (TimeSpan.TryParse(timeProxy, out result))
+                return result;
+            else
+                return null;
+
+        }
+        set
+        {
+
+            InternalValue = value;            
+
+        }
+    }
+
+    private string timeProxy
+    {
+        get => internalValue?.ToString();
+        set
+        {
+            TimeSpan time;
+
+            if (TimeSpan.TryParse(value, out time))
+                internalValue = time;
+            else
+                internalValue = null;
+        }
+    }
+}

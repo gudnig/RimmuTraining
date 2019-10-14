@@ -20,6 +20,7 @@ using RimmuTraining.WebApp.Infrastructure;
 using Blazorise;
 using Blazorise.Bulma;
 using Blazorise.Icons.FontAwesome;
+using RimmuTraining.WebApp.Domain.Practices;
 
 namespace RimmuTraining.WebApp
 {
@@ -70,7 +71,13 @@ namespace RimmuTraining.WebApp
             services.AddScoped<ICommandHandler<ConnectMemberToUser>, ConnectMemberToUserCommandHandler>();
             services.AddScoped<ICommandHandler<CreateMember>, CreateMemberCommandHandler>();
             services.AddScoped<ICommandHandler<AddToRole>, AddToRoleCommandHandler>();
+            services.AddScoped<ICommandHandler<StartPractice>, StartPracticeCommandHandler>();
+            services.AddScoped<IQueryHandler<GetPractices, List<PracticeListItem>>, GetPracticesQueryHandler>();
+            services.AddScoped<IQueryHandler<GetPracticeById, PracticeDetailItem>, GetPracticeByIdQueryHandler>();
+            services.AddScoped<ICommandHandler<RegisterAttendance>, RegisterAttendanceCommandHandler>();
+            services.AddScoped<ICommandHandler<RemoveAttendance>, RemoveAttendanceCommandHandler>();
             services.AddScoped<MembersService>();
+            services.AddScoped<PracticesService>();
 
         }
         

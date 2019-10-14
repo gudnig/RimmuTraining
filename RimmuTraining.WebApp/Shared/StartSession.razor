@@ -1,0 +1,112 @@
+﻿@using RimmuTraining.WebApp.Domain.Practices
+@inject NavigationManager NavigationManager
+@inherits OwningComponentBase<PracticesService>
+
+<AuthorizeView Policy="IsTrainer">
+    <Button Clicked="@ShowModal">Start New Practice</Button>
+
+    <Modal @ref="modalRef">
+        <ModalBackdrop />
+        <ModalContent Size="ModalSize.Small" IsCentered="true">
+            <ModalHeader>
+                <ModalTitle>Start New Practice</ModalTitle>
+                <CloseButton Clicked="@HideModal" />
+            </ModalHeader>
+            <Validations>
+                <Form>
+                    <ModalBody>
+                        <Field>
+                            <Validation Validator="@ValidationRule.IsNotEmpty">
+                                <FieldLabel>Name</FieldLabel>
+                                <SelectEdit TValue="string" @bind-SelectedValue="type">
+                                    <SelectItem Value="@(" Fighting")">Fighting</SelectItem>
+                                    <SelectItem Value="@(" Archery")">Archery</SelectItem>
+                                </SelectEdit>
+                            </Validation>
+                        </Field>
+                        <Validation Validator="@ValidateStartDate">
+                            <Field>
+                                <FieldLabel>Date</FieldLabel>
+                                <DateEdit Date="@start" DateChanged="@StartTimeChanged" />
+                            </Field>
+
+                        </Validation>
+                        <Validation Validator="ValidateStartTime">
+                            <Field>
+                                <FieldLabel>Time</FieldLabel>
+                                @*<input @bind="timeProxy" class="input" type="time" />*@
+                                <TimeEdit Time="startTime" />
+                                <ValidationNone>Time must be selected</ValidationNone>
+
+                            </Field>
+                        </Validation>
+
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button Color="Color.Primary" Clicked="@(() => StartPractice(context.User.Identity.Name))" Type="ButtonType.Submit" PreventDefaultOnSubmit="true" Class="is-right">Add</Button>
+                    </ModalFooter>
+                </Form>
+            </Validations>
+        </ModalContent>
+
+    </Modal>
+</AuthorizeView>
+@code {
+
+    private Modal modalRef;
+    private DateTime? start = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 20, 0, 0);
+    private TimeSpan? startTime = new TimeSpan(20, 0, 0);
+
+    private int durationMinutes = 120;
+    private string type = "Fighting";
+
+    private void ShowModal()
+    {
+        DateTime now = DateTime.Now;
+        start = new DateTime(now.Year, now.Month, now.Day, 20, 0, 0);
+        modalRef.Show();
+    }
+    private async Task StartPractice(string userName)
+    {
+        var id = Guid.NewGuid();
+        var result = await Service.StartPracticeAsync(id, start.Value, start.Value.AddMinutes(durationMinutes), userName, type);
+        if (result.Succeeded)
+        {
+            NavigationManager.NavigateTo(string.Format("/practices/{0}", id));
+        }
+        HideModal();
+    }
+
+    void ValidateStartDate(ValidatorEventArgs e)
+    {
+        var start = (DateTime?)e.Value;
+        if (start.HasValue)
+            e.Status = ValidationStatus.Success;
+        else
+            e.Status = ValidationStatus.None;
+    }
+
+    void ValidateStartTime(ValidatorEventArgs e)
+    {
+        var start = (TimeSpan?)e.Value;
+        if (start.HasValue)
+            e.Status = ValidationStatus.Success;
+        else
+            e.Status = ValidationStatus.None;
+    }
+
+
+
+
+    private void HideModal()
+    {
+        modalRef.Hide();
+    }
+
+    void StartTimeChanged(DateTime? date)
+    {
+        if (date.HasValue)
+            start = new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, 20, 0, 0);
+    }
+
+}

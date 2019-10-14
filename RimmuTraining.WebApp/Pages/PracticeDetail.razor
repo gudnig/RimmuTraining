@@ -1,0 +1,103 @@
+﻿@page "/practices/{id:guid}"
+@using RimmuTraining.WebApp.Domain.Practices
+@inherits OwningComponentBase<PracticesService>
+@attribute [Authorize   ]
+
+@if (practice == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="hero">
+        <div class="hero-body is-primary">
+            <div class="container">
+                <h1 class="title">
+                    @practice.Type Practice  @practice.Start.ToString("dd. MMM yyyy")
+                </h1>
+                <span class="subtitle">
+                    Trainer: @practice.TrainerName From: @practice.Start.ToString("hh:mm") To: @practice.End.ToString("hh:mm")
+                </span>
+            </div>
+        </div>
+        <div class="level is-mobile">
+            <div class="levle-left">
+                <AddMember OnAdd="@OnMemberRegistration">Register New Member</AddMember>
+            </div>
+            <div class="level-right">
+                <div class="level-item">
+
+                    <Autocomplete MinLength="1" Filter="AutocompleteFilter.Contains" Data="@practice.NonAttendingMembers"
+                                  TextField="@((item)=>item.Name)"
+                                  ValueField="@((item)=>item)"
+                                  SelectedValue="@selectedMember"
+                                  SelectedValueChanged="@AddMember"
+                                  Placeholder="Type to add attendance" />
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="list">
+        @if (practice.AttendingMembers != null)
+        {
+            @foreach (var member in practice.AttendingMembers)
+            {
+                <span class="list-item">
+                    @member.Name
+                    <a @onclick="@(() => RemoveMember(member))" class="delete is-pulled-right"></a>
+                </span>
+            }
+        }
+    </div>
+}
+@code {
+    [Parameter]
+    public Guid id { get; set; }
+
+    private PracticeDetailItem practice;
+    private object selectedMember;
+    protected override async Task OnInitializedAsync()
+    {
+        practice = await Service.GetPracticeAsync(id);
+    }
+
+    private void OnMemberRegistration(Domain.Members.Member memberObj)
+    {
+        var members = new Member 
+        {
+            Id = memberObj.Id,
+            Name = memberObj.Name
+        };
+        practice.NonAttendingMembers.Add(members);
+        practice.NonAttendingMembers = practice.NonAttendingMembers.OrderBy(m => m.Name).ToList();
+    }
+
+    private async Task RemoveMember(Member member)
+    {
+        var result = await Service.RemoveAttendanceAsync(member.Id, practice.Id);
+        if (result.Succeeded)
+        {
+            practice.NonAttendingMembers.Add(member);
+            practice.AttendingMembers.Remove(member);
+        }
+    }
+    private async Task AddMember(object newValue)
+    {
+        selectedMember = newValue;
+        var member = (Member)selectedMember;
+        if (member != null)
+        {
+            var result = await Service.RegisterAttendanceAsync(member.Id, practice.Id);
+            if (result.Succeeded)
+            {
+                practice.NonAttendingMembers.Remove(member);
+                practice.AttendingMembers.Add(member);
+                selectedMember = null;
+            }
+        }
+
+        StateHasChanged();
+    }
+}

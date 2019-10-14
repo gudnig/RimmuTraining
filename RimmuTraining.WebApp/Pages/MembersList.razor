@@ -9,9 +9,9 @@
             <h1 class="title">
                 Members
             </h1>
-            <h2 class="subtitle">
+            <span class="subtitle">
                 Manage members and users
-            </h2>
+            </span>
         </div>
     </div>
 </div>
@@ -21,7 +21,7 @@
     <div class="level-left"></div>
     <div class="level-right">
         <div class="level-item">
-            <AddMember OnAdd="@AddMember" />
+            <AddMember OnAdd="@OnMemberRegistration">Register New Member</AddMember>
         </div>
     </div>
 
@@ -48,8 +48,9 @@
     }
 
 
-    private void AddMember(Member member)
+    private void OnMemberRegistration(object memberObj)
     {
+        var member = (Member)memberObj;
         members.Add(member);
         members = members.OrderBy(m => m.Name).ToList();
     }

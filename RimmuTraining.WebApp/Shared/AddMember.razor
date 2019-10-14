@@ -2,13 +2,13 @@
 
 @inherits OwningComponentBase<MembersService>
 
-<Button Clicked="@ShowModal">Add New Member</Button>
+<Button Clicked="@ShowModal">@ChildContent</Button>
 
 <Modal @ref="modalRef">
     <ModalBackdrop />
     <ModalContent IsCentered="true">
         <ModalHeader>
-            <ModalTitle>Add Member</ModalTitle>
+            <ModalTitle>Register New Member</ModalTitle>
             <CloseButton Clicked="@HideModal" />
         </ModalHeader>
         <Form>
@@ -16,7 +16,7 @@
                 <Field>
                     <Validation Validator="@ValidationRule.IsNotEmpty">
                         <FieldLabel>Name</FieldLabel>
-                        <TextEdit Placeholder="Enter full name...">
+                        <TextEdit @bind-Text="newMemberName" Placeholder="Enter full name...">
                             <Feedback>
                                 <ValidationError>Please enter the full name.</ValidationError>
 
@@ -40,6 +40,9 @@
 @code {
     [Parameter]
     public EventCallback<Member> OnAdd { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
     private Modal modalRef;
     private string newMemberName = "";

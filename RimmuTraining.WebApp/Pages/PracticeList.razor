@@ -1,0 +1,67 @@
+﻿@page "/practices"
+@attribute [Authorize]
+@using RimmuTraining.WebApp.Domain.Practices
+@inherits OwningComponentBase<PracticesService>
+@attribute [Authorize(Policy = "IsTrainer")]
+
+<div class="hero">
+    <div class="hero-body is-primary">
+        <div class="container">
+            <h1 class="title">
+                Practices
+            </h1>
+            <span class="subtitle">
+                Overview of practices
+            </span>
+        </div>
+    </div>
+</div>
+
+
+<div class="level">
+    <div class="level-left"></div>
+    <div class="level-right">
+        <div class="level-item">
+            <StartSession />
+        </div>
+    </div>
+
+</div>
+<div class="columns">
+    <AuthorizeView Roles="Fighting Trainer">
+
+        <div class="column">
+            <div class="title is-4">Fighting Practice Sessions</div>
+            <div class="list">
+                @if (fightingPracticeSessions != null)
+                {
+                    @foreach (var practice in fightingPracticeSessions)
+                    {
+                        <a href="practices/@practice.Id" class="list-item">
+                            @practice.Start.ToString("dd. MMM yyyy") From @practice.Start.ToString("HH:mm") - @practice.End.ToString("HH:mm")
+                            Attending: @practice.NumberOfAttendees
+                        </a>
+                    }
+                }
+            </div>
+
+        </div>
+    </AuthorizeView>
+    <AuthorizeView Roles="Archery Trainer">
+        <div class="column">
+
+        </div>
+    </AuthorizeView>
+
+</div>
+
+@code {
+    private List<PracticeListItem> fightingPracticeSessions;
+    private List<PracticeListItem> archeryPracticeSessions;
+    protected override async Task OnInitializedAsync()
+    {
+        var allPracticeSessions = await Service.GetPracticesAsync();
+        fightingPracticeSessions = allPracticeSessions.Where(p => p.Type == "Fighting").ToList();
+        archeryPracticeSessions = allPracticeSessions.Where(p => p.Type == "Archer").ToList();
+    }
+}
