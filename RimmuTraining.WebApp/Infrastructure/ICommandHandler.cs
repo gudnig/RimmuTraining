@@ -34,6 +34,14 @@ namespace RimmuTraining.WebApp.Infrastructure
         }
         public bool Succeeded { get; set; }
         public List<string> Errors { get; set; }
+
+        public string Error
+        {
+            get
+            {
+                return string.Join(", ", Errors);
+            }
+        }
     }
     public interface ICommandHandler<TCommand>
     {

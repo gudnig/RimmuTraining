@@ -58,6 +58,7 @@
 @code {
     private List<PracticeListItem> fightingPracticeSessions;
     private List<PracticeListItem> archeryPracticeSessions;
+    [CascadingParameter] ErrorAlert ErrorAlert { get; set; }
     protected override async Task OnInitializedAsync()
     {
         var allPracticeSessions = await Service.GetPracticesAsync();

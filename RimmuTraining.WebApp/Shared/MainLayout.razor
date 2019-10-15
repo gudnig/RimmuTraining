@@ -8,7 +8,7 @@
         <BarToggler>
         </BarToggler>
     </BarBrand>
-    
+
     <BarMenu>
         <BarStart>
             <AuthorizeView Policy="IsTrainer">
@@ -31,16 +31,16 @@
 
 
 <section class="main-content columns is-fullheight section">
-    <div class="container">
-        @Body
-    </div>
+    <CascadingValue Value="@alertRef">
+        <div class="container">
+            <ErrorAlert @ref="alertRef"></ErrorAlert>
+            @Body
+        </div>
+    </CascadingValue>
 </section>
 
 
-
-
-
-
-
-
-
+@code {
+    public ErrorAlert alertRef;
+    private string ErrorValue = "";
+}

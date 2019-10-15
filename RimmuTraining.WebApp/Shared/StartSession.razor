@@ -15,6 +15,7 @@
             <Validations>
                 <Form>
                     <ModalBody>
+                        <ErrorAlert @ref="ErrorAlert"></ErrorAlert>
                         <Field>
                             <Validation Validator="@ValidationRule.IsNotEmpty">
                                 <FieldLabel>Name</FieldLabel>
@@ -52,7 +53,7 @@
     </Modal>
 </AuthorizeView>
 @code {
-
+    private ErrorAlert ErrorAlert;
     private Modal modalRef;
     private DateTime? start = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 20, 0, 0);
     private TimeSpan? startTime = new TimeSpan(20, 0, 0);
@@ -73,6 +74,10 @@
         if (result.Succeeded)
         {
             NavigationManager.NavigateTo(string.Format("/practices/{0}", id));
+        }
+        else
+        {
+            ErrorAlert.Show(result.Error);
         }
         HideModal();
     }

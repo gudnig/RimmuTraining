@@ -90,6 +90,7 @@ else
 @code {
     [Parameter]
     public Guid id { get; set; }
+    [CascadingParameter] ErrorAlert ErrorAlert { get; set; }
     private List<User> unconnectedUsers = new List<User>();
     private Member member;
     private User nullUser = new User
@@ -98,7 +99,6 @@ else
         UserName = "Select a user"
     };
     private Guid selectedUserId;
-    
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,10 +109,11 @@ else
 
     private async Task OnUserSelected(Guid userId)
     {
+
         var user = unconnectedUsers.FirstOrDefault(u => u.Id == userId);
         if (userId == Guid.Empty)
         {
-            // Show error
+            ErrorAlert.Show("Error selecting user.");
 
         }
         var result = await Service.ConnectMemberAndUserAsync(member.Id, userId);
@@ -125,6 +126,10 @@ else
                 UserName = user.UserName
             };
         }
+        else
+        {
+            ErrorAlert.Show(result.Error);
+        }
     }
 
     private async Task AddToRole(string role)
@@ -134,6 +139,10 @@ else
         {
             member.User.Roles.Add(role);
         }
+        else
+            {
+                ErrorAlert.Show(result.Error);
+            }
     }
 
 }

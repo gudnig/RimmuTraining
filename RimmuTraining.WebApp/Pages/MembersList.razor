@@ -41,6 +41,7 @@
 @code {
     private List<Member> members;
     private List<User> unconnectedUsers = new List<User>();
+    [CascadingParameter] ErrorAlert ErrorAlert { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

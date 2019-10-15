@@ -13,6 +13,7 @@
         </ModalHeader>
         <Form>
             <ModalBody>
+                <ErrorAlert @ref="ErrorAlert"></ErrorAlert>
                 <Field>
                     <Validation Validator="@ValidationRule.IsNotEmpty">
                         <FieldLabel>Name</FieldLabel>
@@ -44,6 +45,8 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
+    private ErrorAlert ErrorAlert;
+
     private Modal modalRef;
     private string newMemberName = "";
 
@@ -72,9 +75,13 @@
                 {
                     Id = id,
                     Name = newMemberName,
-                    
+
                 });
                 HideModal();
+            }
+            else
+            {
+                ErrorAlert.Show(result.Error);
             }
         }
     }

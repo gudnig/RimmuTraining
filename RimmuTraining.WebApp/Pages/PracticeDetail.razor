@@ -1,7 +1,7 @@
 ﻿@page "/practices/{id:guid}"
 @using RimmuTraining.WebApp.Domain.Practices
 @inherits OwningComponentBase<PracticesService>
-@attribute [Authorize   ]
+@attribute [Authorize]
 
 @if (practice == null)
 {
@@ -57,6 +57,7 @@ else
     public Guid id { get; set; }
 
     private PracticeDetailItem practice;
+    [CascadingParameter] ErrorAlert ErrorAlert { get; set; }
     private object selectedMember;
     protected override async Task OnInitializedAsync()
     {
@@ -65,7 +66,7 @@ else
 
     private void OnMemberRegistration(Domain.Members.Member memberObj)
     {
-        var members = new Member 
+        var members = new Member
         {
             Id = memberObj.Id,
             Name = memberObj.Name
@@ -82,6 +83,10 @@ else
             practice.NonAttendingMembers.Add(member);
             practice.AttendingMembers.Remove(member);
         }
+        else
+        {
+            ErrorAlert.Show(result.Error);
+        }
     }
     private async Task AddMember(object newValue)
     {
@@ -96,6 +101,14 @@ else
                 practice.AttendingMembers.Add(member);
                 selectedMember = null;
             }
+            else
+            {
+                ErrorAlert.Show(result.Error);
+            }
+        }
+        else
+        {
+            ErrorAlert.Show("Error selecting member.");
         }
 
         StateHasChanged();

@@ -1,0 +1,21 @@
+﻿<Alert Class="is-overlay" @ref="myAlert" Color="Color.Danger">
+    <strong>@errorText</strong>
+    <CloseButton Clicked="Hide  " />
+</Alert>
+
+@code {
+    private Alert myAlert;
+    private string errorText;
+
+    public void Show(string errorText)
+    {
+        this.errorText = errorText;
+        myAlert.Show();
+    }
+
+    private void Hide()
+    {
+        errorText = "";
+        myAlert.Hide();
+    }
+}
