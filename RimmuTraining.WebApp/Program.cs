@@ -26,10 +26,10 @@ namespace RimmuTraining.WebApp
             
             return Host.CreateDefaultBuilder(args).ConfigureAppConfiguration((context, config) =>
             {
-                if (context.HostingEnvironment.IsDevelopment())
+                if (context.HostingEnvironment.IsEnvironment("DevelopmentLocal"))
                 {
 
-                }
+                }                
                 else
                 {
                     var tokenProvider = new AzureServiceTokenProvider();

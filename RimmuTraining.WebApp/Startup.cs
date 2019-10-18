@@ -26,20 +26,33 @@ namespace RimmuTraining.WebApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+
+        public IWebHostEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration["prodDb"];
-            services.AddDbContext<RimmuDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            if (Environment.IsEnvironment("DevelopmentLocal"))
+            {
+                // Arrange dev data
+                services.AddDbContext<RimmuDbContext>(options =>
+                    options.UseInMemoryDatabase("RimmuDb"));
+            }
+            else
+            {
+                var connectionString = Configuration["prodDb"];
+                services.AddDbContext<RimmuDbContext>(options =>
+                    options.UseSqlServer(connectionString));
+            }
+            
             services.AddDefaultIdentity<RimmuUser>(options =>
             {
                 options.Password.RequireDigit = false;
